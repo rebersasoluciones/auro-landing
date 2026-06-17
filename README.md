@@ -9,7 +9,8 @@ Estética xilográfica en verde oscuro + crema/marfil, con tipografía Barlow Co
 Sitio estático, sin build. Se sirve tal cual.
 
 ```
-index.html            # Landing principal
+index.html            # Landing principal (alemán — mercado objetivo)
+index.es.html         # Misma landing en español (equivalencia de traducción)
 impressum.html        # Aviso legal (§5 DDG/TMG)
 datenschutz.html      # Política de privacidad (DSGVO/RGPD)
 kontakt.html          # Contacto
