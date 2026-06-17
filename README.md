@@ -1,6 +1,6 @@
-# AEORUM — Landing Page
+# AURO — Landing Page
 
-Landing page de **AEORUM**, aceite de oliva virgen extra de Jaén (100% Arbequina), orientada al mercado alemán. Markteinführung 2026.
+Landing page de **AURO**, aceite de oliva virgen extra de Jaén (100% Arbequina), orientada al mercado alemán. Markteinführung 2026.
 
 Estética xilográfica en verde oscuro + crema/marfil, con tipografía Barlow Condensed / DM Sans, animaciones GSAP y un formulario de captación de leads (Vormerkung) con consentimiento RGPD.
 
@@ -50,14 +50,14 @@ El archivo `.nojekyll` evita el procesado por Jekyll.
 
 ### Dominio propio (opcional)
 
-Hay una plantilla `CNAME.example` con el dominio (`aeorum.de`). **No se activa hasta que
+Hay una plantilla `CNAME.example` con el dominio (`auro.de`). **No se activa hasta que
 lo renombres a `CNAME`** — así no interfiere con la URL `*.github.io` mientras no tengas
 el dominio y el DNS listos.
 
 **Para activarlo:**
 
 1. Configura el DNS de tu dominio:
-   - **Apex (`aeorum.de`)** → registros `A` a las IP de GitHub Pages:
+   - **Apex (`auro.de`)** → registros `A` a las IP de GitHub Pages:
      ```
      185.199.108.153
      185.199.109.153
@@ -65,11 +65,11 @@ el dominio y el DNS listos.
      185.199.111.153
      ```
      (y opcionalmente los `AAAA`: `2606:50c0:8000::153` … `8003::153`)
-   - **Subdominio (`www.aeorum.de`)** → registro `CNAME` a `<usuario>.github.io.`
+   - **Subdominio (`www.auro.de`)** → registro `CNAME` a `<usuario>.github.io.`
 2. Renombra el archivo y haz push:
    ```bash
    git mv CNAME.example CNAME
-   git commit -m "Activa dominio propio aeorum.de"
+   git commit -m "Activa dominio propio auro.de"
    git push
    ```
 3. En **Settings → Pages → Custom domain**, escribe el dominio y marca **Enforce HTTPS**.
