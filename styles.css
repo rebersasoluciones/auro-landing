@@ -205,7 +205,7 @@ p{ color:var(--negro-oliva); }
    ------------------------------------------------------------ */
 .hero__media model-viewer{
   width:100%;
-  height:clamp(500px, 82vh, 740px);
+  height:clamp(520px, 86vh, 820px);
   background:transparent;
   --poster-color:transparent;
   --progress-bar-color:var(--dorado);
@@ -254,9 +254,9 @@ p{ color:var(--negro-oliva); }
 .hero__grid{
   display:grid;
   grid-template-columns:1fr 1fr;   /* 360° izquierda · texto derecha */
-  gap:clamp(40px, 7vw, 150px);     /* separa más las columnas */
+  gap:clamp(48px, 9vw, 220px);     /* separa más las columnas */
   align-items:center;
-  max-width:1640px;                /* usa más ancho de pantalla */
+  max-width:1820px;                /* usa más ancho de pantalla */
   padding-block:clamp(48px,7vw,96px);
 }
 .hero__claim{

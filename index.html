@@ -263,14 +263,14 @@
     input.addEventListener('change', function(){ input.value = clamp(parseInt(input.value,10)); });
   })();
 
-  /* Acerca la cámara del visor 3D del hero para que la lata se vea más grande */
+  /* Aleja la cámara del visor 3D del hero para que la lata se vea entera */
   (function(){
     var mv = document.querySelector('.hero__media model-viewer');
     if(!mv) return;
     mv.addEventListener('load', function(){
       try{
         var o = mv.getCameraOrbit();
-        mv.cameraOrbit = o.theta + 'rad ' + o.phi + 'rad ' + (o.radius * 0.9) + 'm';
+        mv.cameraOrbit = o.theta + 'rad ' + o.phi + 'rad ' + (o.radius * 1.2) + 'm';
         if (mv.jumpCameraToGoal) mv.jumpCameraToGoal();
       }catch(e){}
     });
