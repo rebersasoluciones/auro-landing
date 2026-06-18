@@ -1,6 +1,6 @@
 # macOS
 .DS_Store
-# Editor / OS
+# Editor / OSs
 .vscode/
 Thumbs.db
 # Logs
