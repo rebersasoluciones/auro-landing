@@ -250,6 +250,63 @@ p{ color:var(--negro-oliva); }
   margin-bottom:26px;
 }
 
+/* Visor 360° (secuencia de imágenes) */
+.viewer-360{
+  position:relative;
+  aspect-ratio:560 / 720;
+  height:clamp(420px, 60vh, 640px);
+  max-width:100%;
+  margin-inline:auto;
+  border-radius:var(--radius);
+  cursor:grab;
+  touch-action:pan-y;             /* arrastre horizontal gira · vertical hace scroll */
+  user-select:none; -webkit-user-select:none;
+  outline-offset:4px;
+}
+.viewer-360.is-dragging{ cursor:grabbing; }
+.viewer-360:focus-visible{ outline:2px solid var(--dorado); }
+.viewer-360__img,
+.viewer-360__fallback{
+  width:100%; height:100%;
+  object-fit:contain;
+  border-radius:var(--radius);
+  pointer-events:none;
+  -webkit-user-drag:none;
+  filter:saturate(1.04) contrast(1.02) brightness(1.01); /* = .img-warm */
+}
+/* Capa de carga */
+.viewer-360__overlay{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px;
+  color:var(--gris-texto);
+  font-family:var(--font-heading); letter-spacing:.1em; font-size:.8rem;
+}
+.viewer-360__spinner{
+  width:30px; height:30px; border-radius:50%;
+  border:2px solid color-mix(in srgb, var(--verde-oliva) 30%, transparent);
+  border-top-color:var(--dorado);
+  animation:viewer360-spin .8s linear infinite;
+}
+@keyframes viewer360-spin{ to{ transform:rotate(360deg); } }
+/* Pista de arrastre */
+.viewer-360__hint{
+  position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
+  display:inline-flex; align-items:center; gap:.4em;
+  background:color-mix(in srgb, var(--negro-oliva) 78%, transparent);
+  color:var(--crema);
+  font-family:var(--font-heading); font-weight:500;
+  text-transform:uppercase; letter-spacing:.1em; font-size:.66rem;
+  padding:.5em 1em; border-radius:var(--radius-pill);
+  opacity:0; transition:opacity .4s ease; pointer-events:none;
+  backdrop-filter:blur(4px);
+}
+.viewer-360.is-ready .viewer-360__hint{ opacity:.92; }
+.viewer-360.is-touched .viewer-360__hint{ opacity:0; }
+@media (prefers-reduced-motion:reduce){
+  .viewer-360__spinner{ animation:none; }
+}
+
 /* ------------------------------------------------------------
    8. BLOQUE DE ORIGEN
    ------------------------------------------------------------ */
@@ -408,6 +465,7 @@ p{ color:var(--negro-oliva); }
 @media (max-width:960px){
   .hero__grid{ grid-template-columns:1fr; gap:40px; }
   .hero__media{ order:-1; }
+  .viewer-360{ height:auto; width:min(82%, 360px); }
   .origin__grid{ grid-template-columns:1fr; }
   .product__grid{ grid-template-columns:1fr; }
   .attrs__grid{ grid-template-columns:repeat(2,1fr); }
