@@ -5,7 +5,6 @@
    Acabado satinado con reflejos (RoomEnvironment). Respeta reduced-motion.
    ============================================================ */
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js';
 
 (function () {
   const canvas = document.querySelector('.olive-band__canvas');
@@ -22,9 +21,23 @@ import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
   camera.position.set(0, 0, 16);
 
-  // Reflejos de estudio → aspecto satinado/aceitoso en las aceitunas
+  // Reflejos satinados con un entorno de degradado propio (solo three core)
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+  const envTex = (function () {
+    const c = document.createElement('canvas'); c.width = 16; c.height = 64;
+    const ctx = c.getContext('2d');
+    const g = ctx.createLinearGradient(0, 0, 0, 64);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.5, '#f1ead8');
+    g.addColorStop(1, '#c9bd93');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, 16, 64);
+    const t = new THREE.CanvasTexture(c);
+    t.mapping = THREE.EquirectangularReflectionMapping;
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  })();
+  scene.environment = pmrem.fromEquirectangular(envTex).texture;
+  envTex.dispose();
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.55));
   const key = new THREE.DirectionalLight(0xffffff, 1.3);
