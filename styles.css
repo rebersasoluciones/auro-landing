@@ -201,39 +201,35 @@ p{ color:var(--negro-oliva); }
 .nav-toggle span{ width:24px; height:2px; background:var(--negro-oliva); transition:.3s; }
 
 /* ------------------------------------------------------------
-   6b. LATA 3D — primer bloque (showcase del producto)
+   6b. LATA 3D — primer bloque (marco como el de producto)
    ------------------------------------------------------------ */
-.lata-stage{
+.lata-stage__frame{
   position:relative;
-  width:100%;
-  min-height:min(86vh, 760px);
-  display:grid; place-items:center;
-  overflow:hidden;
-  background:
-    radial-gradient(60% 55% at 50% 42%,
-      color-mix(in srgb, var(--blanco-calido) 96%, transparent) 0%,
-      color-mix(in srgb, var(--blanco-calido) 34%, transparent) 46%,
-      transparent 72%),
-    var(--crema);
-  border-bottom:var(--line);
+  max-width:560px;
+  margin-inline:auto;
+  background:var(--blanco-calido);
+  border:var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow-soft);
+  padding:clamp(16px, 3vw, 40px);
 }
-.lata-stage model-viewer{
+.lata-stage__frame model-viewer{
   width:100%;
-  height:min(86vh, 760px);
+  height:clamp(460px, 64vh, 620px);
   background:transparent;
   --poster-color:transparent;
   --progress-bar-color:var(--dorado);
   cursor:grab;
 }
-.lata-stage model-viewer:active{ cursor:grabbing; }
+.lata-stage__frame model-viewer:active{ cursor:grabbing; }
 .lata-stage__hint{
-  position:absolute; bottom:22px; left:50%; transform:translateX(-50%);
+  position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
   display:inline-flex; gap:.5em; align-items:center;
   background:color-mix(in srgb, var(--negro-oliva) 80%, transparent);
   color:var(--crema);
   font-family:var(--font-heading); font-weight:500;
-  text-transform:uppercase; letter-spacing:.1em; font-size:.68rem;
-  padding:.55em 1.1em; border-radius:var(--radius-pill);
+  text-transform:uppercase; letter-spacing:.1em; font-size:.66rem;
+  padding:.5em 1.05em; border-radius:var(--radius-pill);
   backdrop-filter:blur(4px); pointer-events:none;
 }
 
@@ -509,8 +505,6 @@ p{ color:var(--negro-oliva); }
   .site-footer__top{ grid-template-columns:1fr 1fr; }
 }
 @media (max-width:680px){
-  .lata-stage{ min-height:min(72vh, 540px); }
-  .lata-stage model-viewer{ height:min(72vh, 540px); }
   .nav, .header-actions .btn-sm{ display:none; }
   .nav-toggle{ display:flex; }
   /* nav móvil desplegable */

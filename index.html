@@ -51,25 +51,30 @@
   <!-- ============================================================
        LATA 3D — primer bloque (solo el producto, interactivo)
        ============================================================ -->
-  <section class="lata-stage" aria-label="Lata de AURO · modelo 3D interactivo">
-    <model-viewer
-        src="assets/3d/lata.glb"
-        alt="Lata de AURO — aceite de oliva virgen extra 500 ml, modelo 3D interactivo"
-        poster="assets/lata-auro.png"
-        camera-controls
-        disable-zoom
-        auto-rotate
-        auto-rotate-delay="0"
-        rotation-per-second="20deg"
-        interaction-prompt="auto"
-        camera-orbit="-25deg 80deg auto"
-        shadow-intensity="0.9"
-        shadow-softness="1"
-        exposure="1"
-        environment-image="neutral"
-        touch-action="pan-y"
-        loading="eager"></model-viewer>
-    <span class="lata-stage__hint" aria-hidden="true">↔ Gira la lata</span>
+  <section class="section lata-stage" aria-label="Lata de AURO · modelo 3D interactivo">
+    <div class="container">
+      <div class="lata-stage__frame">
+        <model-viewer
+            src="assets/3d/lata.glb"
+            alt="Lata de AURO — aceite de oliva virgen extra 500 ml, modelo 3D interactivo"
+            poster="assets/lata-auro.png"
+            camera-controls
+            disable-zoom
+            auto-rotate
+            auto-rotate-delay="0"
+            rotation-per-second="20deg"
+            interaction-prompt="auto"
+            camera-orbit="-25deg 80deg auto"
+            field-of-view="30deg"
+            shadow-intensity="0.9"
+            shadow-softness="1"
+            exposure="1"
+            environment-image="neutral"
+            touch-action="pan-y"
+            loading="eager"></model-viewer>
+        <span class="lata-stage__hint" aria-hidden="true">↔ Gira la lata</span>
+      </div>
+    </div>
   </section>
 
   <!-- ============================================================
@@ -266,6 +271,19 @@
     document.getElementById('qtyMinus').addEventListener('click', function(){ input.value = clamp(parseInt(input.value,10)-1); });
     document.getElementById('qtyPlus').addEventListener('click', function(){ input.value = clamp(parseInt(input.value,10)+1); });
     input.addEventListener('change', function(){ input.value = clamp(parseInt(input.value,10)); });
+  })();
+
+  /* Acerca la cámara del visor 3D para que la lata llene mejor el bloque */
+  (function(){
+    var mv = document.querySelector('.lata-stage model-viewer');
+    if(!mv) return;
+    mv.addEventListener('load', function(){
+      try{
+        var o = mv.getCameraOrbit();
+        mv.cameraOrbit = o.theta + 'rad ' + o.phi + 'rad ' + (o.radius * 0.72) + 'm';
+        if (mv.jumpCameraToGoal) mv.jumpCameraToGoal();
+      }catch(e){}
+    });
   })();
 </script>
 
