@@ -6,33 +6,23 @@
 <title>AURO · Lata 3D (prototipo)</title>
 <meta name="robots" content="noindex">
 <style>
-  :root{
-    --crema:#F4EFE5; --negro-oliva:#171713; --dorado:#B9983A; --verde-oliva:#6F6B2E;
-  }
+  :root{ --crema:#F4EFE5; --negro-oliva:#171713; --dorado:#B9983A; --verde-oliva:#6F6B2E; }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; }
-  body{
-    background:var(--crema);
-    font-family:'Inter',system-ui,sans-serif;
-    color:var(--negro-oliva);
-    overflow:hidden;
-  }
-  #app{ position:fixed; inset:0; }
-  canvas{ display:block; touch-action:none; }
+  body{ background:var(--crema); font-family:'Inter',system-ui,sans-serif; color:var(--negro-oliva); overflow:hidden; }
 
-  .ui{ position:fixed; left:0; right:0; pointer-events:none; }
+  model-viewer{
+    width:100%; height:100%;
+    --poster-color:transparent;
+    --progress-bar-color:var(--dorado);
+    background:var(--crema);
+  }
+
+  .ui{ position:fixed; left:0; right:0; pointer-events:none; z-index:2; }
   .ui--top{ top:0; padding:22px 26px; }
   .ui--bottom{ bottom:0; padding:22px 26px; text-align:center; }
-
-  .brand{
-    font-family:'Oswald','Arial Narrow',sans-serif; font-weight:700;
-    letter-spacing:.02em; font-size:1.5rem; text-transform:uppercase;
-  }
-  .tag{
-    display:inline-block; margin-top:2px;
-    font-size:.7rem; letter-spacing:.16em; text-transform:uppercase;
-    color:var(--verde-oliva);
-  }
+  .brand{ font-family:'Oswald','Arial Narrow',sans-serif; font-weight:700; letter-spacing:.02em; font-size:1.5rem; text-transform:uppercase; }
+  .tag{ display:inline-block; margin-top:2px; font-size:.7rem; letter-spacing:.16em; text-transform:uppercase; color:var(--verde-oliva); }
   .hint{
     display:inline-flex; gap:.5em; align-items:center;
     background:rgba(23,23,19,.82); color:var(--crema);
@@ -40,167 +30,48 @@
     padding:.6em 1.1em; border-radius:999px; backdrop-filter:blur(4px);
     transition:opacity .5s ease;
   }
-
-  #loader{
-    position:fixed; inset:0; display:grid; place-items:center;
-    background:var(--crema); transition:opacity .5s ease; z-index:5;
+  /* Botón AR (model-viewer) */
+  .ar-btn{
+    position:absolute; top:16px; right:16px;
+    background:var(--negro-oliva); color:var(--crema);
+    font-family:'Oswald',sans-serif; font-weight:600; letter-spacing:.08em;
+    text-transform:uppercase; font-size:.74rem;
+    padding:.7em 1.2em; border-radius:999px; border:0; cursor:pointer;
   }
-  #loader.hidden{ opacity:0; pointer-events:none; }
-  .spinner{
-    width:38px; height:38px; border-radius:50%;
-    border:3px solid color-mix(in srgb, var(--verde-oliva) 30%, transparent);
-    border-top-color:var(--dorado); animation:spin .8s linear infinite;
-  }
-  @keyframes spin{ to{ transform:rotate(360deg); } }
-
-  #fallback{
-    position:fixed; inset:0; display:none; place-items:center; padding:30px;
-    text-align:center; background:var(--crema); z-index:6;
-  }
-  #fallback p{ max-width:34ch; line-height:1.5; }
 </style>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
 
-<div id="app"></div>
+<model-viewer
+    src="assets/3d/lata.glb"
+    alt="Lata de AURO — aceite de oliva virgen extra, modelo 3D interactivo"
+    poster="assets/lata-auro.png"
+    camera-controls
+    auto-rotate
+    auto-rotate-delay="0"
+    rotation-per-second="22deg"
+    interaction-prompt="auto"
+    camera-orbit="-25deg 78deg auto"
+    min-camera-orbit="auto 0deg auto"
+    max-camera-orbit="auto 180deg auto"
+    shadow-intensity="1"
+    shadow-softness="0.9"
+    exposure="1"
+    environment-image="neutral"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    touch-action="pan-y">
+  <button slot="ar-button" class="ar-btn">Ver en tu espacio (AR)</button>
+</model-viewer>
 
 <div class="ui ui--top">
   <div class="brand">AURO</div>
   <span class="tag">Lata 3D · prototipo</span>
 </div>
 <div class="ui ui--bottom">
-  <span class="hint" id="hint">↔ Arrastra para girar · rueda / pellizca para zoom</span>
+  <span class="hint">↔ Arrastra para girar · rueda / pellizca para zoom</span>
 </div>
 
-<div id="loader"><div class="spinner"></div></div>
-<div id="fallback"><p>Tu navegador no pudo cargar el visor 3D (WebGL). Prueba en Chrome/Edge/Safari actualizado o revisa la conexión.</p></div>
-
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
-
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-try {
-  const app = document.getElementById('app');
-  const loader = document.getElementById('loader');
-  const hint = document.getElementById('hint');
-
-  // --- Renderer ---
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(innerWidth, innerHeight);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
-  app.appendChild(renderer.domElement);
-
-  // --- Scene & camera ---
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xF4EFE5);
-
-  const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.1, 100);
-  camera.position.set(2.2, 0.7, 4.4);
-
-  // Reflejos de estudio (sin archivos externos)
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-
-  // Luces de apoyo
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-  const key = new THREE.DirectionalLight(0xffffff, 2.2);
-  key.position.set(3, 5, 4);
-  scene.add(key);
-  const rim = new THREE.DirectionalLight(0xffffff, 0.8);
-  rim.position.set(-4, 2, -3);
-  scene.add(rim);
-
-  // --- Lata (caja redondeada metálica) ---
-  const W = 1.3, H = 1.9, D = 0.75;
-  const tin = new THREE.Group();
-  scene.add(tin);
-
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0xE9E2D2, metalness: 0.65, roughness: 0.34,
-  });
-  const body = new THREE.Mesh(new RoundedBoxGeometry(W, H, D, 6, 0.06), bodyMat);
-  tin.add(body);
-
-  // Tapa metálica encima
-  const capMat = new THREE.MeshStandardMaterial({ color: 0xB9983A, metalness: 0.95, roughness: 0.22 });
-  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.34, 32), capMat);
-  cap.position.y = H / 2 + 0.14;
-  tin.add(cap);
-
-  // Etiquetas (frente y dorso) con el arte de la marca
-  const loaderTex = new THREE.TextureLoader();
-  loaderTex.load('assets/lata-auro.png', (tex) => {
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const labelMat = new THREE.MeshStandardMaterial({
-      map: tex, transparent: true, metalness: 0.1, roughness: 0.55,
-    });
-    const lw = W * 0.98, lh = lw * (612 / 408); // respeta proporción del arte
-    const labelGeo = new THREE.PlaneGeometry(lw, Math.min(lh, H * 0.98));
-
-    const front = new THREE.Mesh(labelGeo, labelMat);
-    front.position.z = D / 2 + 0.012;
-    tin.add(front);
-
-    const back = new THREE.Mesh(labelGeo, labelMat);
-    back.position.z = -D / 2 - 0.012;
-    back.rotation.y = Math.PI;
-    tin.add(back);
-
-    loader.classList.add('hidden');
-  }, undefined, () => { loader.classList.add('hidden'); });
-
-  // --- Controles ---
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-  controls.enablePan = false;
-  controls.minDistance = 3;
-  controls.maxDistance = 8;
-  controls.autoRotate = !reduceMotion;
-  controls.autoRotateSpeed = 1.4;
-  controls.target.set(0, 0, 0);
-
-  let touched = false;
-  controls.addEventListener('start', () => {
-    controls.autoRotate = false;
-    if (!touched) { touched = true; hint.style.opacity = '0'; }
-  });
-
-  // --- Resize ---
-  addEventListener('resize', () => {
-    camera.aspect = innerWidth / innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-  });
-
-  // --- Loop ---
-  (function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-  })();
-
-} catch (err) {
-  console.error(err);
-  document.getElementById('loader').style.display = 'none';
-  document.getElementById('fallback').style.display = 'grid';
-}
-</script>
 </body>
 </html>
