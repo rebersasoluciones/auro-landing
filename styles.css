@@ -227,13 +227,34 @@ p{ color:var(--negro-oliva); }
 }
 .hero__cta{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; }
 
-/* Imagen de producto del hero */
+/* Producto del hero */
 .hero__media{ position:relative; display:flex; justify-content:center; }
 .hero__media img{
   width:auto;
   max-height:clamp(420px, 64vh, 680px);
   border-radius:var(--radius);
   box-shadow:var(--shadow-soft);
+}
+/* Visor 3D en el hero */
+.hero__media model-viewer{
+  width:100%;
+  height:clamp(440px, 64vh, 660px);
+  background:transparent;
+  --poster-color:transparent;
+  --progress-bar-color:var(--dorado);
+  --progress-mask:transparent;
+  cursor:grab;
+}
+.hero__media model-viewer:active{ cursor:grabbing; }
+/* Escenario: halo cálido que encaja con la crema */
+.hero__media::after{
+  content:"";
+  position:absolute; z-index:-1;
+  inset:5% 2% 9%;
+  background:radial-gradient(58% 52% at 50% 44%,
+    color-mix(in srgb, var(--blanco-calido) 94%, transparent) 0%,
+    color-mix(in srgb, var(--blanco-calido) 28%, transparent) 48%,
+    transparent 72%);
 }
 /* Detalle gráfico: bloque verde oliva + línea dorada */
 .hero__media::before{

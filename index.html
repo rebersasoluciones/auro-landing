@@ -14,6 +14,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
+
+<!-- Visor 3D (model-viewer) -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
 
@@ -63,7 +66,24 @@
       </div>
 
       <div class="hero__media">
-        <img src="assets/lata-auro.png" class="img-warm" alt="Lata de AURO — aceite de oliva virgen extra 500 ml" loading="eager">
+        <model-viewer
+            src="assets/3d/lata.glb"
+            alt="Lata de AURO — aceite de oliva virgen extra 500 ml, modelo 3D interactivo"
+            poster="assets/lata-auro.png"
+            camera-controls
+            disable-zoom
+            auto-rotate
+            auto-rotate-delay="0"
+            rotation-per-second="20deg"
+            interaction-prompt="auto"
+            camera-orbit="-25deg 80deg auto"
+            shadow-intensity="0.9"
+            shadow-softness="1"
+            exposure="1"
+            environment-image="neutral"
+            touch-action="pan-y"
+            loading="eager"></model-viewer>
+        <noscript><img src="assets/lata-auro.png" class="img-warm" alt="Lata de AURO — aceite de oliva virgen extra 500 ml"></noscript>
       </div>
     </div>
   </section>
