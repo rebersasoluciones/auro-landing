@@ -413,6 +413,7 @@
         <span class="badge">Edición cosecha 2026</span>
         <h2 class="product__name">AURO · 500 ml</h2>
         <p class="product__price">29,00 € <small>/ lata · IVA incl.</small></p>
+        <p class="product__fresh"><span class="product__fresh-dot" aria-hidden="true"></span><span id="freshTxt">Recién embotellado</span></p>
         <p class="product__desc">Aceite de oliva virgen extra 100% Picual de cosecha temprana. Verde, frutado y con un amargor noble. Envasado en lata para protegerlo de la luz.</p>
 
         <div class="product__buy">
@@ -527,6 +528,16 @@
         if (mv.jumpCameraToGoal) mv.jumpCameraToGoal();
       }catch(e){}
     });
+  })();
+
+  /* Contador de frescura (edita BOTTLED con tu fecha real de embotellado) */
+  (function(){
+    var BOTTLED = new Date('2026-05-20');
+    var el = document.getElementById('freshTxt'); if(!el) return;
+    var d = Math.max(0, Math.floor((Date.now() - BOTTLED.getTime()) / 86400000));
+    el.textContent = d <= 0
+      ? 'Embotellado hoy · cosecha 2025/26'
+      : 'Embotellado hace ' + d + (d === 1 ? ' día' : ' días') + ' · cosecha 2025/26';
   })();
 </script>
 
