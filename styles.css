@@ -755,16 +755,24 @@ p{ color:var(--negro-oliva); }
   background-repeat:repeat;
 }
 
-/* Banner-bloque con frase sobre mosaico de ramas (negro de la lata) */
+/* Divider realista: guirnalda de rama de olivo (botánica) que recorre el separador */
+.leaf-divider{
+  width:100%;
+  height:clamp(50px, 7vw, 82px);
+  background-color:var(--crema);
+  background-image:url("assets/rama-pattern.svg");
+  background-repeat:repeat-x;
+  background-position:center;
+  background-size:auto 66%;
+  border-block:var(--line);
+}
+.leaf-divider--olive{ background-color:#eef0e0; }
+
+/* Banner-bloque con frase (negro de la lata) — sin patrón */
 .band-statement{
   position:relative; overflow:hidden; text-align:center;
   padding-block:clamp(56px, 9vw, 110px);
   background-color:#1B1B17; color:#E7E3CE;
-}
-.band-statement::before{
-  content:""; position:absolute; inset:0; opacity:.5; pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='80'%20height='80'%3E%3Cpath%20d='M10,66Q36,48,64,16'%20fill='none'%20stroke='%23BE9B3A'%20stroke-width='1.6'%20stroke-linecap='round'/%3E%3Cg%20fill='%23BE9B3A'%3E%3Cellipse%20cx='24'%20cy='55'%20rx='10'%20ry='3.2'%20transform='rotate(38,24,55)'/%3E%3Cellipse%20cx='40'%20cy='38'%20rx='10'%20ry='3.2'%20transform='rotate(34,40,38)'/%3E%3C/g%3E%3Cg%20fill='%236b7a3e'%3E%3Cellipse%20cx='62'%20cy='18'%20rx='4.4'%20ry='5.4'/%3E%3C/g%3E%3C/svg%3E");
-  background-size:80px 80px;
 }
 .band-statement__txt{
   position:relative; z-index:1;
