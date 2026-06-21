@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURO · Fondo interactivo de olivos</title>
+<style>
+  html,body{ margin:0; height:100%; background:#F5F0E8; overflow:hidden; }
+  #c{ display:block; width:100vw; height:100vh; touch-action:none; cursor:pointer; }
+  .wm{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'Oswald','Arial Narrow',sans-serif; font-weight:700; letter-spacing:.06em;
+    font-size:clamp(2rem,7vw,5rem); color:#171713; opacity:.07; pointer-events:none; user-select:none;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="wm">AURO</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('c');
+
+  // ---------- Renderer ----------
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setClearColor(0xF5F0E8, 1);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  if (THREE.sRGBEncoding) renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+
+  // ---------- Cámara ortográfica (2.5D, sin controles) ----------
+  let H = 1.6; // semialto visible
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 50);
+  camera.position.set(0, 0, 10);
+  function applyCam() {
+    const a = innerWidth / innerHeight;
+    camera.left = -H * a; camera.right = H * a; camera.top = H; camera.bottom = -H;
+    camera.updateProjectionMatrix();
+  }
+  applyCam();
+
+  // ---------- Luces ----------
+  scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.05);
+  sun.position.set(-3, 4, 3);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  const sc = sun.shadow.camera;
+  sc.left = -4; sc.right = 4; sc.top = 4; sc.bottom = -4; sc.near = 0.1; sc.far = 25;
+  scene.add(sun);
+
+  // Plano receptor de sombras (al fondo, color crema)
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(40, 40),
+    new THREE.MeshStandardMaterial({ color: 0xF5F0E8, roughness: 1 })
+  );
+  floor.position.z = -0.35;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // ---------- Materiales / geometrías compartidas ----------
+  const barkMat = new THREE.MeshStandardMaterial({ color: 0x5C3D1E, roughness: 0.9 });
+  function leafTexture() {
+    const cv = document.createElement('canvas'); cv.width = 64; cv.height = 32;
+    const x = cv.getContext('2d');
+    x.fillStyle = '#000'; x.fillRect(0, 0, 64, 32);
+    x.fillStyle = '#fff'; x.beginPath(); x.ellipse(32, 16, 30, 13, 0, 0, Math.PI * 2); x.fill();
+    return new THREE.CanvasTexture(cv);
+  }
+  const leafMat = new THREE.MeshStandardMaterial({
+    color: 0x6B7A3E, roughness: 0.7, side: THREE.DoubleSide,
+    alphaMap: leafTexture(), transparent: true, alphaTest: 0.4,
+  });
+  const leafGeo = new THREE.PlaneGeometry(0.09, 0.045);
+  const oliveGeo = new THREE.SphereGeometry(0.04, 16, 12);
+  const oliveColors = [0x2D4A1E, 0x2D4A1E, 0x1A1A1A]; // verde oscuro + negro mezclados
+
+  const interactive = [];   // proxies de raycast (tubos invisibles)
+  const branches = [];      // ramas
+  const falling = [];       // aceitunas cayendo
+  const tmp = new THREE.Object3D();
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  // ---------- Construcción de una rama ----------
+  function genPoints(dir, len, segs, wob) {
+    // dir: THREE.Vector2 unitario de crecimiento; devuelve Vector3[] desde (0,0,0)
+    const pts = [new THREE.Vector3(0, 0, 0)];
+    const perp = new THREE.Vector2(-dir.y, dir.x);
+    let acc = 0;
+    for (let i = 1; i <= segs; i++) {
+      const tcur = i / segs;
+      acc += len / segs;
+      const off = Math.sin(tcur * Math.PI * rnd(1, 1.8) + wob) * len * 0.18 * (1 - tcur * 0.3);
+      pts.push(new THREE.Vector3(
+        dir.x * acc + perp.x * off,
+        dir.y * acc + perp.y * off,
+        rnd(-0.05, 0.05)
+      ));
+    }
+    return pts;
+  }
+
+  function leavesAlong(curve, from, to, every, list) {
+    for (let t = from; t <= to; t += every) {
+      const p = curve.getPointAt(t);
+      const tan = curve.getTangentAt(t);
+      const ang = Math.atan2(tan.y, tan.x);
+      for (const side of [1, -1]) {
+        list.push({
+          x: p.x, y: p.y, z: p.z,
+          rz: ang + side * (Math.PI / 2) * rnd(0.7, 1.0),
+          rx: rnd(-0.5, 0.5),
+          s: rnd(0.7, 1.25),
+        });
+      }
+    }
+  }
+
+  function addOliveCluster(shaker, pos, n, entry) {
+    for (let i = 0; i < n; i++) {
+      const m = new THREE.Mesh(
+        oliveGeo,
+        new THREE.MeshStandardMaterial({
+          color: oliveColors[(Math.random() * oliveColors.length) | 0],
+          roughness: 0.35, metalness: 0.1,
+        })
+      );
+      m.castShadow = true;
+      m.scale.setScalar(rnd(0.8, 1.25));
+      m.position.set(pos.x + rnd(-0.05, 0.05), pos.y + rnd(-0.06, 0.04), pos.z + rnd(-0.03, 0.03));
+      shaker.add(m);
+      entry.olives.push(m);
+    }
+  }
+
+  function makeBranch(baseX, baseY, dir, len) {
+    const swayer = new THREE.Group();
+    swayer.position.set(baseX, baseY, rnd(-0.1, 0.1));
+    const shaker = new THREE.Group();
+    swayer.add(shaker);
+    scene.add(swayer);
+
+    const entry = {
+      swayer, shaker, olives: [],
+      amp: rnd(0.025, 0.045), freq: rnd(0.4, 0.9), phase: rnd(0, 6.28), cd: 0,
+    };
+    branches.push(entry);
+
+    const leafList = [];
+
+    // --- curva principal ---
+    const mainPts = genPoints(dir, len, 5, rnd(0, 6.28));
+    const mainCurve = new THREE.CatmullRomCurve3(mainPts);
+    const mainTube = new THREE.Mesh(new THREE.TubeGeometry(mainCurve, 64, 0.008, 6, false), barkMat);
+    mainTube.castShadow = true;
+    shaker.add(mainTube);
+    addHit(mainCurve, 0.05, entry);
+    leavesAlong(mainCurve, 0.12, 0.96, 0.1, leafList);
+
+    // aceitunas al final de la principal
+    addOliveCluster(shaker, mainCurve.getPointAt(1), 2 + ((Math.random() * 3) | 0), entry);
+
+    // --- sub-ramas ---
+    const subN = 1 + ((Math.random() * 2) | 0);
+    for (let s = 0; s < subN; s++) {
+      const t0 = rnd(0.35, 0.75);
+      const origin = mainCurve.getPointAt(t0);
+      const tan = mainCurve.getTangentAt(t0);
+      const sideSign = Math.random() < 0.5 ? 1 : -1;
+      const sdir = new THREE.Vector2(
+        tan.x * 0.4 - tan.y * sideSign,
+        tan.y * 0.4 + tan.x * sideSign
+      ).normalize();
+      const subPts = genPoints(sdir, len * rnd(0.4, 0.6), 4, rnd(0, 6.28))
+        .map((p) => p.clone().add(origin));
+      const subCurve = new THREE.CatmullRomCurve3(subPts);
+      const subTube = new THREE.Mesh(new THREE.TubeGeometry(subCurve, 40, 0.004, 5, false), barkMat);
+      subTube.castShadow = true;
+      shaker.add(subTube);
+      addHit(subCurve, 0.04, entry);
+      leavesAlong(subCurve, 0.15, 0.95, 0.14, leafList);
+      addOliveCluster(shaker, subCurve.getPointAt(1), 2 + ((Math.random() * 2) | 0), entry);
+    }
+
+    // --- hojas instanciadas (todas las de la rama) ---
+    const inst = new THREE.InstancedMesh(leafGeo, leafMat, leafList.length);
+    inst.castShadow = false;
+    leafList.forEach((lf, i) => {
+      tmp.position.set(lf.x, lf.y, lf.z);
+      tmp.rotation.set(lf.rx, 0, lf.rz);
+      tmp.scale.setScalar(lf.s);
+      tmp.updateMatrix();
+      inst.setMatrixAt(i, tmp.matrix);
+    });
+    inst.instanceMatrix.needsUpdate = true;
+    shaker.add(inst);
+  }
+
+  function addHit(curve, radius, entry) {
+    const hit = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, 24, radius, 4, false),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    hit.userData.branch = entry;
+    entry.shaker.add(hit);
+    interactive.push(hit);
+  }
+
+  // ---------- Distribución de 5-7 ramas ----------
+  (function build() {
+    const a = innerWidth / innerHeight;
+    const halfW = H * a;
+    // izquierda
+    makeBranch(-halfW * 0.99, rnd(-0.7, 0.5), new THREE.Vector2(1, rnd(-0.1, 0.25)).normalize(), rnd(1.7, 2.4));
+    makeBranch(-halfW * 0.99, rnd(0.4, 0.95), new THREE.Vector2(1, rnd(-0.3, 0.0)).normalize(), rnd(1.4, 2.0));
+    // derecha
+    makeBranch(halfW * 0.99, rnd(-0.6, 0.5), new THREE.Vector2(-1, rnd(-0.1, 0.25)).normalize(), rnd(1.7, 2.4));
+    makeBranch(halfW * 0.99, rnd(0.4, 0.95), new THREE.Vector2(-1, rnd(-0.25, 0.05)).normalize(), rnd(1.3, 1.9));
+    // colgando desde arriba
+    makeBranch(rnd(-halfW * 0.5, -0.1), H * 0.99, new THREE.Vector2(rnd(-0.2, 0.2), -1).normalize(), rnd(1.4, 2.1));
+    makeBranch(rnd(0.1, halfW * 0.5), H * 0.99, new THREE.Vector2(rnd(-0.2, 0.2), -1).normalize(), rnd(1.4, 2.1));
+  })();
+
+  // ---------- Interacción ----------
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  function toPointer(e) {
+    const r = canvas.getBoundingClientRect();
+    pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+  }
+  function pickBranch() {
+    raycaster.setFromCamera(pointer, camera);
+    const hits = raycaster.intersectObjects(interactive, false);
+    return hits.length ? hits[0].object.userData.branch : null;
+  }
+
+  function shake(entry) {
+    const now = performance.now();
+    if (now < entry.cd) return;       // cooldown anti-spam
+    entry.cd = now + 800;
+    gsap.killTweensOf(entry.shaker.rotation);
+    gsap.timeline()
+      .to(entry.shaker.rotation, { z: 0.14, duration: 0.07, ease: 'power2.out' })   // +8°
+      .to(entry.shaker.rotation, { z: -0.05, duration: 0.08 })
+      .to(entry.shaker.rotation, { z: 0.03, duration: 0.08 })
+      .to(entry.shaker.rotation, { z: 0, duration: 0.45, ease: 'elastic.out(1,0.4)' });
+    releaseOlives(entry, 1 + ((Math.random() * 3) | 0));
+  }
+
+  function releaseOlives(entry, n) {
+    for (let k = 0; k < n && entry.olives.length; k++) {
+      const idx = (Math.random() * entry.olives.length) | 0;
+      const m = entry.olives.splice(idx, 1)[0];
+      scene.attach(m); // conserva la posición en mundo
+      falling.push({
+        mesh: m,
+        vel: new THREE.Vector3(rnd(-0.01, 0.01), rnd(0.0, 0.012), rnd(-0.005, 0.005)),
+        spin: new THREE.Vector3(rnd(-0.08, 0.08), rnd(-0.08, 0.08), rnd(-0.08, 0.08)),
+        born: performance.now(),
+        fading: false, done: false,
+      });
+    }
+  }
+
+  canvas.addEventListener('pointermove', (e) => { toPointer(e); const b = pickBranch(); if (b) shake(b); });
+  canvas.addEventListener('pointerdown', (e) => { toPointer(e); const b = pickBranch(); if (b) shake(b); });
+
+  // ---------- Loop ----------
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // brisa (idle sway)
+    for (const b of branches) b.swayer.rotation.z = Math.sin(t * b.freq + b.phase) * b.amp;
+
+    // física de aceitunas caídas
+    for (let i = falling.length - 1; i >= 0; i--) {
+      const o = falling[i];
+      o.vel.y -= 0.002;                 // gravedad manual
+      o.mesh.position.add(o.vel);
+      o.mesh.rotation.x += o.spin.x; o.mesh.rotation.y += o.spin.y; o.mesh.rotation.z += o.spin.z;
+      if (o.mesh.position.y <= -1.5) {  // rebote
+        o.mesh.position.y = -1.5;
+        o.vel.y *= -0.5; o.vel.x *= 0.6; o.spin.multiplyScalar(0.6);
+      }
+      if (!o.fading && performance.now() - o.born > 2000) {
+        o.fading = true; o.mesh.material.transparent = true;
+        gsap.to(o.mesh.material, { opacity: 0, duration: 0.6, onComplete: () => { o.done = true; } });
+      }
+      if (o.done) { scene.remove(o.mesh); o.mesh.geometry === oliveGeo || o.mesh.geometry.dispose(); falling.splice(i, 1); }
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  function resize() { renderer.setSize(innerWidth, innerHeight); applyCam(); }
+  addEventListener('resize', resize);
+  resize();
+  animate();
+})();
+</script>
+</body>
+</html>
