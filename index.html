@@ -72,7 +72,11 @@
             exposure="1"
             environment-image="neutral"
             touch-action="pan-y"
-            loading="eager"></model-viewer>
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            loading="eager">
+          <button slot="ar-button" class="ar-btn">Ver en tu cocina (AR)</button>
+        </model-viewer>
         <span class="hero__hint" aria-hidden="true">↔ Gira la lata</span>
       </div>
 
@@ -158,6 +162,45 @@
         </article>
 
       </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FICHA DE CATA VIVA (radar + datos)
+       ============================================================ -->
+  <section class="section cata" id="cata">
+    <div class="container">
+      <div class="cata__head">
+        <p class="kicker kicker--gold">Análisis &amp; cata</p>
+        <h2 class="h-lg">La calidad, en números</h2>
+        <p class="cata__intro">Cosecha temprana 100% Picual. Esto es, de verdad, lo que hay dentro de cada lata.</p>
+      </div>
+
+      <div class="cata__grid">
+        <div class="cata__radar">
+          <svg class="radar" role="img" aria-label="Perfil de cata: frutado, amargo, picante, verde, almendra y manzana"></svg>
+        </div>
+
+        <div class="cata__stats">
+          <div class="stat">
+            <div class="stat__top"><span class="stat__label">Polifenoles</span><span class="stat__value">580 mg/kg</span></div>
+            <div class="stat__bar"><div class="stat__fill" data-pct="83"></div></div>
+            <p class="stat__note">Cosecha temprana: máximos antioxidantes (&gt;250 = saludable).</p>
+          </div>
+          <div class="stat">
+            <div class="stat__top"><span class="stat__label">Acidez</span><span class="stat__value">0,2%</span></div>
+            <div class="stat__bar"><div class="stat__fill" data-pct="75"></div></div>
+            <p class="stat__note">Muy por debajo del límite AOVE (≤0,8%). Menos = más puro.</p>
+          </div>
+          <div class="stat">
+            <div class="stat__top"><span class="stat__label">Peróxidos</span><span class="stat__value">8 meq O₂/kg</span></div>
+            <div class="stat__bar"><div class="stat__fill" data-pct="60"></div></div>
+            <p class="stat__note">Frescura óptima (límite legal ≤20).</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="cata__note">* Valores de ejemplo de la cosecha 2026. Sustitúyelos por los de tu analítica.</p>
     </div>
   </section>
 
@@ -286,6 +329,9 @@
     });
   })();
 </script>
+
+<!-- Ficha de cata viva (radar + datos) -->
+<script src="assets/cata.js" defer></script>
 
 <!-- Banda decorativa de olivas (three.js) -->
 <script type="module" src="assets/olive-band.js"></script>
