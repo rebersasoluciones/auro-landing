@@ -29,6 +29,17 @@
       "Tostada de pan con un chorro de aceite de oliva virgen extra AURO": "Toast drizzled with AURO extra virgin olive oil",
       "Ensalada fresca aliñada con aceite de oliva virgen extra AURO": "Fresh salad dressed with AURO extra virgin olive oil",
       "Más ideas para usar AURO": "More ways to use AURO",
+      /* Ajustes 2026 (lista de espera, envíos, media) */
+      "Apúntate y te avisamos en cuanto salga la primera cosecha. Los primeros de la lista entran antes que nadie.": "Sign up and we'll let you know the moment the first harvest is out. The first on the list get in before anyone else.",
+      "Edición limitada de 1.000 latas": "Limited edition of 1,000 tins",
+      "Primera cosecha de octubre · latas numeradas de un lote único, sin reposición.": "First harvest in October · numbered tins from a single batch, no restock.",
+      "personas ya se han inscrito.": "people have already signed up.",
+      "¿Cómo y dónde hacéis los envíos?": "How and where do you ship?",
+      "Enviamos a domicilio a toda Europa. Prepararemos los envíos cuando abramos la venta; los detalles de plazos y gastos por país llegarán primero a quienes estén en la lista.": "We ship to homes across all of Europe. We'll arrange shipping when sales open; details on delivery times and costs per country will reach those on the list first.",
+      "Olivares centenarios de Sierra Mágina, Jaén, al atardecer": "Centuries-old olive groves of Sierra Mágina, Jaén, at sunset",
+      "Aceite de oliva virgen extra AURO recién elaborado, vertido en copa de cata": "Freshly made AURO extra virgin olive oil poured into a tasting glass",
+      "Cosecha temprana 100% Picual, recién extraída en frío.": "Early-harvest 100% Picual, freshly cold-extracted.",
+      "Lata de AURO 500 ml, modelo 3D interactivo": "AURO tin 500 ml, interactive 3D model",
       /* head / nav / hero */
       "AURO — Aceite de Oliva Virgen Extra · Sierra Mágina, Jaén": "AURO — Extra Virgin Olive Oil · Sierra Mágina, Jaén",
       "Origen": "Origin",
@@ -256,6 +267,17 @@
       "Tostada de pan con un chorro de aceite de oliva virgen extra AURO": "Brot mit einem Spritzer AURO nativem Olivenöl extra",
       "Ensalada fresca aliñada con aceite de oliva virgen extra AURO": "Frischer Salat mit AURO nativem Olivenöl extra",
       "Más ideas para usar AURO": "Weitere Ideen für AURO",
+      /* Ajustes 2026 (lista de espera, envíos, media) */
+      "Apúntate y te avisamos en cuanto salga la primera cosecha. Los primeros de la lista entran antes que nadie.": "Trag dich ein und wir benachrichtigen dich, sobald die erste Ernte da ist. Die Ersten auf der Liste kommen vor allen anderen dran.",
+      "Edición limitada de 1.000 latas": "Limitierte Edition von 1.000 Dosen",
+      "Primera cosecha de octubre · latas numeradas de un lote único, sin reposición.": "Erste Ernte im Oktober · nummerierte Dosen aus einer einzigen Charge, ohne Nachproduktion.",
+      "personas ya se han inscrito.": "Personen haben sich bereits eingetragen.",
+      "¿Cómo y dónde hacéis los envíos?": "Wie und wohin versendet ihr?",
+      "Enviamos a domicilio a toda Europa. Prepararemos los envíos cuando abramos la venta; los detalles de plazos y gastos por país llegarán primero a quienes estén en la lista.": "Wir liefern nach Hause in ganz Europa. Wir organisieren den Versand, sobald der Verkauf startet; Details zu Lieferzeiten und Kosten je Land erhalten zuerst die Personen auf der Liste.",
+      "Olivares centenarios de Sierra Mágina, Jaén, al atardecer": "Jahrhundertealte Olivenhaine der Sierra Mágina, Jaén, bei Sonnenuntergang",
+      "Aceite de oliva virgen extra AURO recién elaborado, vertido en copa de cata": "Frisch hergestelltes AURO natives Olivenöl extra, in ein Verkostungsglas gegossen",
+      "Cosecha temprana 100% Picual, recién extraída en frío.": "Frühe Ernte, 100% Picual, frisch kalt extrahiert.",
+      "Lata de AURO 500 ml, modelo 3D interactivo": "AURO-Dose 500 ml, interaktives 3D-Modell",
       "AURO — Aceite de Oliva Virgen Extra · Sierra Mágina, Jaén": "AURO — Natives Olivenöl Extra · Sierra Mágina, Jaén",
       "Origen": "Herkunft",
       "Cosecha": "Ernte",
@@ -464,14 +486,19 @@
 
   var ATTRS = ['placeholder', 'alt', 'aria-label', 'title'];
 
-  // Idioma por defecto: ALEMÁN. Se respeta la elección guardada del usuario
-  // (selector ES · EN · DE); cualquier visitante nuevo ve la web en alemán.
+  // Idioma. Precedencia:
+  //   1) ?lang= en la URL (deep-link / hreflang explícito)
+  //   2) elección guardada del usuario (selector ES · EN · DE)
+  //   3) data-lang de la página (las páginas /es/ y /en/ lo fijan)
+  //   4) ALEMÁN por defecto (dominio .de) — cualquier visitante nuevo ve alemán.
+  function normLang(l) { return (l === 'es' || l === 'en' || l === 'de') ? l : null; }
   var lang = 'de';
+  var pageLang = document.documentElement.getAttribute('data-lang');
   try {
+    var q = new URLSearchParams(location.search).get('lang');
     var saved = localStorage.getItem('auro_lang');
-    if (saved === 'es' || saved === 'en' || saved === 'de') lang = saved;
-  } catch (e) {}
-  if (lang !== 'en' && lang !== 'es') lang = 'de';
+    lang = normLang(q) || normLang(saved) || normLang(pageLang) || 'de';
+  } catch (e) { lang = normLang(pageLang) || 'de'; }
 
   function t(str) {
     if (!str || lang === 'es') return str;

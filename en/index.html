@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en" data-lang="en">
 <head>
 <!-- Consent Mode v2 (RGPD/DSGVO) — por defecto DENEGADO hasta que el usuario consienta.
      Debe ejecutarse ANTES de Google Tag Manager y de Google Analytics. -->
@@ -47,7 +47,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 <!-- End Google Analytics 4 -->
 <!-- Banner de consentimiento de cookies (RGPD/DSGVO) -->
-<script defer src="assets/consent.js"></script>
+<script defer src="../assets/consent.js"></script>
 <!-- End banner de consentimiento -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,24 +56,25 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <!-- hreflang / idioma — alemán (auro.de) como predeterminado (x-default).
      Equivalencia por país: DE=raíz, ES=/es/, EN=/en/. -->
-<link rel="canonical" href="https://auro.de/">
+<link rel="canonical" href="https://auro.de/en/">
 <link rel="alternate" hreflang="de" href="https://auro.de/">
 <link rel="alternate" hreflang="es" href="https://auro.de/es/">
 <link rel="alternate" hreflang="en" href="https://auro.de/en/">
 <link rel="alternate" hreflang="x-default" href="https://auro.de/">
-<meta property="og:locale" content="de_DE">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="de_DE">
 <meta property="og:locale:alternate" content="es_ES">
-<meta property="og:locale:alternate" content="en_US">
 
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
 
 <!-- Tipografías -->
-<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
 
 <link rel="stylesheet" href="styles.css">
 
 <!-- i18n (ES · EN · DE) — define window.AuroI18n antes que mapa/cata -->
-<script src="assets/i18n.js"></script>
+<script>try{if(!new URLSearchParams(location.search).has('lang'))localStorage.setItem('auro_lang','en')}catch(e){}</script>
+<script src="../assets/i18n.js"></script>
 
 <!-- Mapa relieve 3D (MapLibre GL) -->
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
@@ -93,7 +94,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header class="site-header">
   <div class="container site-header__inner">
     <a href="#top" class="brand" aria-label="AURO — Inicio">
-      <img src="assets/logo-auro.png" alt="AURO">
+      <img src="../assets/logo-auro.png" alt="AURO">
     </a>
 
     <nav class="nav" id="nav" aria-label="Principal">
@@ -128,9 +129,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="container hero__grid">
       <div class="hero__media">
         <model-viewer
-            src="assets/3d/lata.glb"
+            src="../assets/3d/lata.glb"
             alt="Lata de AURO — aceite de oliva virgen extra 500 ml, modelo 3D interactivo"
-            poster="assets/lata-auro.png"
+            poster="../assets/lata-auro.png"
             camera-controls
             disable-zoom
             auto-rotate
@@ -181,7 +182,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="origin__media">
         <figure class="origin-hero" aria-hidden="false">
-          <img src="assets/origen-sierra.jpg" class="origin-hero__img img-warm" alt="Olivares centenarios de Sierra Mágina, Jaén, al atardecer" loading="lazy" width="1500" height="1000">
+          <img src="../assets/origen-sierra.jpg" class="origin-hero__img img-warm" alt="Olivares centenarios de Sierra Mágina, Jaén, al atardecer" loading="lazy" width="1500" height="1000">
           <figcaption class="origin-hero__cap editorial editorial-i">Sierra Mágina · Jaén</figcaption>
         </figure>
       </div>
@@ -279,7 +280,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="cata__grid cata__grid--media">
         <figure class="cata__media">
-          <img src="assets/cata-produccion.jpg" alt="Aceite de oliva virgen extra AURO recién elaborado, vertido en copa de cata" loading="lazy" width="1500" height="1000">
+          <img src="../assets/cata-produccion.jpg" alt="Aceite de oliva virgen extra AURO recién elaborado, vertido en copa de cata" loading="lazy" width="1500" height="1000">
           <figcaption class="cata__media-cap">Cosecha temprana 100% Picual, recién extraída en frío.</figcaption>
         </figure>
 
@@ -327,9 +328,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="lata__media">
           <model-viewer
               class="lata__viewer"
-              src="assets/3d/lata.glb"
+              src="../assets/3d/lata.glb"
               alt="Lata de AURO 500 ml, modelo 3D interactivo"
-              poster="assets/lata-auro.png"
+              poster="../assets/lata-auro.png"
               camera-controls
               disable-zoom
               auto-rotate
@@ -372,8 +373,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <h3>Denominación de Origen Protegida</h3>
               <p>Sierra Mágina, en el corazón de Jaén, cuenta con su propia D.O.P.: un sello europeo que garantiza el origen, la variedad y la calidad del aceite de esta sierra. Altitud, frío y sol que dan un aceite más aromático y equilibrado.</p>
               <div class="lata__sellos">
-                <img src="assets/sello-do-sierra-magina.png" alt="D.O.P. Sierra Mágina" class="sello" onerror="this.style.display='none'">
-                <img src="assets/sello-origen-espana.png" alt="Denominación de Origen Protegida" class="sello" onerror="this.style.display='none'">
+                <img src="../assets/sello-do-sierra-magina.png" alt="D.O.P. Sierra Mágina" class="sello" onerror="this.style.display='none'">
+                <img src="../assets/sello-origen-espana.png" alt="Denominación de Origen Protegida" class="sello" onerror="this.style.display='none'">
               </div>
             </article>
             <article class="lata__info" data-k="picual">
@@ -417,7 +418,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="pslide" aria-label="Paso 1 de 6">
           <div class="pslide__media">
-            <img src="assets/proceso/01.jpg" alt="Recolección de la aceituna Picual" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
+            <img src="../assets/proceso/01.jpg" alt="Recolección de la aceituna Picual" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
             <span class="pslide__tag">Recolección</span>
           </div>
           <div class="pslide__body">
@@ -429,7 +430,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="pslide" aria-label="Paso 2 de 6">
           <div class="pslide__media">
-            <img src="assets/proceso/02.jpg" alt="Aceituna recién recogida camino del molino" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
+            <img src="../assets/proceso/02.jpg" alt="Aceituna recién recogida camino del molino" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
             <span class="pslide__tag">Al molino</span>
           </div>
           <div class="pslide__body">
@@ -441,7 +442,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="pslide" aria-label="Paso 3 de 6">
           <div class="pslide__media">
-            <img src="assets/proceso/03.jpg" alt="Molienda de la aceituna" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
+            <img src="../assets/proceso/03.jpg" alt="Molienda de la aceituna" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
             <span class="pslide__tag">Molturación</span>
           </div>
           <div class="pslide__body">
@@ -453,7 +454,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="pslide" aria-label="Paso 4 de 6">
           <div class="pslide__media">
-            <img src="assets/proceso/04.jpg" alt="Batido de la pasta de aceituna en frío" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
+            <img src="../assets/proceso/04.jpg" alt="Batido de la pasta de aceituna en frío" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
             <span class="pslide__tag">Batido en frío</span>
           </div>
           <div class="pslide__body">
@@ -466,7 +467,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="pslide" aria-label="Paso 5 de 6">
           <div class="pslide__media">
-            <img src="assets/proceso/05.jpg" alt="Separación del aceite por centrifugado" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
+            <img src="../assets/proceso/05.jpg" alt="Separación del aceite por centrifugado" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
             <span class="pslide__tag">Extracción</span>
           </div>
           <div class="pslide__body">
@@ -478,7 +479,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="pslide" aria-label="Paso 6 de 6">
           <div class="pslide__media">
-            <img src="assets/proceso/06.jpg" alt="Envasado del aceite en lata" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
+            <img src="../assets/proceso/06.jpg" alt="Envasado del aceite en lata" loading="lazy" onerror="this.closest('.pslide__media').classList.add('is-empty');this.remove()">
             <span class="pslide__tag">Envasado</span>
           </div>
           <div class="pslide__body">
@@ -518,7 +519,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="recetas__grid">
         <article class="receta-card">
           <div class="receta-card__media">
-            <img src="assets/recetas/tostada.jpg" alt="Tostada de pan con un chorro de aceite de oliva virgen extra AURO" loading="lazy" width="1400" height="1400">
+            <img src="../assets/recetas/tostada.jpg" alt="Tostada de pan con un chorro de aceite de oliva virgen extra AURO" loading="lazy" width="1400" height="1400">
           </div>
           <div class="receta-card__body">
             <h3>Tostadas y pan</h3>
@@ -528,7 +529,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <article class="receta-card">
           <div class="receta-card__media">
-            <img src="assets/recetas/ensalada.jpg" alt="Ensalada fresca aliñada con aceite de oliva virgen extra AURO" loading="lazy" width="1400" height="1400">
+            <img src="../assets/recetas/ensalada.jpg" alt="Ensalada fresca aliñada con aceite de oliva virgen extra AURO" loading="lazy" width="1400" height="1400">
           </div>
           <div class="receta-card__body">
             <h3>Ensaladas y verduras</h3>
@@ -583,7 +584,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
         <label class="wl-consent">
           <input type="checkbox" id="wlConsent" required>
-          <span>Acepto recibir un email cuando AURO esté disponible y el tratamiento de mis datos según la <a href="politica-privacidad.html">política de privacidad</a>. Puedo darme de baja en cualquier momento.</span>
+          <span>Acepto recibir un email cuando AURO esté disponible y el tratamiento de mis datos según la <a href="../politica-privacidad.html">política de privacidad</a>. Puedo darme de baja en cualquier momento.</span>
         </label>
         <button type="submit" class="btn btn-primary wl-submit" id="wlSubmit" disabled>Únete a la lista</button>
         <p class="wl-mini">Sin spam. Solo un email cuando arranque.</p>
@@ -660,7 +661,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="site-footer__top">
       <div>
         <a href="#top" class="footer-logo" aria-label="AURO — Inicio">
-          <img src="assets/logo-auro.png" alt="AURO">
+          <img src="../assets/logo-auro.png" alt="AURO">
         </a>
         <p style="margin-top:14px;">Aceite de oliva virgen extra de cosecha temprana. Elaborado en Sierra Mágina, Jaén.</p>
       </div>
@@ -678,10 +679,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
-        <a href="aviso-legal.html">Aviso legal</a>
-        <a href="politica-privacidad.html">Política de privacidad</a>
-        <a href="politica-cookies.html">Política de cookies</a>
-        <a href="politica-redes-sociales.html">Política de redes sociales</a>
+        <a href="../aviso-legal.html">Aviso legal</a>
+        <a href="../politica-privacidad.html">Política de privacidad</a>
+        <a href="../politica-cookies.html">Política de cookies</a>
+        <a href="../politica-redes-sociales.html">Política de redes sociales</a>
       </div>
     </div>
 
@@ -710,23 +711,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </script>
 
 <!-- Ficha de cata viva (radar + datos) -->
-<script src="assets/cata.js" defer></script>
+<script src="../assets/cata.js" defer></script>
 
 <!-- Menú móvil + CTA fija -->
-<script src="assets/nav.js" defer></script>
+<script src="../assets/nav.js" defer></script>
 
 <!-- La lata (explorador interactivo) -->
-<script src="assets/lata.js" defer></script>
+<script src="../assets/lata.js" defer></script>
 
 <!-- Proceso (carrusel deslizable estilo stories) -->
-<script src="assets/proceso.js" defer></script>
+<script src="../assets/proceso.js" defer></script>
 
 <!-- Lista de espera (lead → Odoo) + cuenta atrás del footer -->
-<script src="assets/waitlist.js" defer></script>
+<script src="../assets/waitlist.js" defer></script>
 
 <!-- Mapa relieve 3D (MapLibre GL) -->
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-<script src="assets/mapa.js"></script>
+<script src="../assets/mapa.js"></script>
 
 </body>
 </html>

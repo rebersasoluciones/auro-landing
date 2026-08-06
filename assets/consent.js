@@ -47,7 +47,7 @@
       analytics: 'Analyse',
       analyticsDesc: 'Google Analytics – hilft uns zu verstehen, wie die Website genutzt wird.',
       marketing: 'Marketing',
-      marketingDesc: 'Messung von Werbung und Reichweite (Google Ads, TikTok).',
+      marketingDesc: 'Messung von Werbung und Reichweite (Meta/Facebook, Google Ads, TikTok).',
       reopen: 'Cookie-Einstellungen'
     },
     es: {
@@ -64,7 +64,7 @@
       analytics: 'Analítica',
       analyticsDesc: 'Google Analytics — nos ayuda a entender cómo se usa la web.',
       marketing: 'Marketing',
-      marketingDesc: 'Medición de publicidad y alcance (Google Ads, TikTok).',
+      marketingDesc: 'Medición de publicidad y alcance (Meta/Facebook, Google Ads, TikTok).',
       reopen: 'Configurar cookies'
     },
     en: {
@@ -81,7 +81,7 @@
       analytics: 'Analytics',
       analyticsDesc: 'Google Analytics — helps us understand how the site is used.',
       marketing: 'Marketing',
-      marketingDesc: 'Advertising and reach measurement (Google Ads, TikTok).',
+      marketingDesc: 'Advertising and reach measurement (Meta/Facebook, Google Ads, TikTok).',
       reopen: 'Cookie settings'
     }
   };
@@ -89,7 +89,7 @@
   function t() { return I18N[getLang()] || I18N.de; }
 
   function cookiePolicyHref() {
-    var sub = /\/(de|personaliza|fondo-olivos)\//.test(location.pathname);
+    var sub = /\/(de|es|en|personaliza|fondo-olivos)\//.test(location.pathname);
     return (sub ? '../' : '') + 'politica-cookies.html';
   }
 
@@ -117,9 +117,29 @@
       consent_analytics: !!consent.analytics,
       consent_ads: !!consent.ads
     });
-    // Etiquetas de marketing (TikTok) — solo con consentimiento de marketing/ads
-    if (consent.ads) loadTikTok();
-    else if (window.ttq && window.ttq.revokeConsent) { try { window.ttq.revokeConsent(); } catch (e) {} }
+    // Etiquetas de marketing (TikTok + Meta) — solo con consentimiento de marketing/ads
+    if (consent.ads) { loadTikTok(); loadMeta(); }
+    else {
+      if (window.ttq && window.ttq.revokeConsent) { try { window.ttq.revokeConsent(); } catch (e) {} }
+      if (window.fbq) { try { window.fbq('consent', 'revoke'); } catch (e) {} }
+    }
+  }
+
+  /* ---------- Meta (Facebook) Pixel — se carga SOLO con consentimiento de marketing ---------- */
+  var META_ID = '1767761024402899';
+  var metaLoaded = false;
+  function loadMeta() {
+    if (metaLoaded) { if (window.fbq) { try { window.fbq('consent', 'grant'); } catch (e) {} } return; }
+    metaLoaded = true;
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments) };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
+    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    // Cargamos el pixel ya con consentimiento otorgado (sólo llegamos aquí si consintió marketing)
+    window.fbq('consent', 'grant');
+    window.fbq('init', META_ID);
+    window.fbq('track', 'PageView');
   }
 
   /* ---------- TikTok Pixel — se carga SOLO con consentimiento de marketing ---------- */
@@ -320,9 +340,9 @@
 
     var existing = load();
     if (existing && (existing.analytics != null)) {
-      // Ya eligió: el head ya aplicó el estado de Google; cargamos TikTok si aceptó
-      // marketing y dejamos el acceso para cambiar la elección.
-      if (existing.ads) loadTikTok();
+      // Ya eligió: el head ya aplicó el estado de Google; cargamos TikTok + Meta si
+      // aceptó marketing y dejamos el acceso para cambiar la elección.
+      if (existing.ads) { loadTikTok(); loadMeta(); }
       ensureReopen();
     } else {
       buildBanner(null);

@@ -34,7 +34,12 @@
   };
 
   var LS_KEY = 'auro_waitlist_leads';
-  var WAITLIST_BASE = 500;   // plazas de partida (ya llenas). Edítalo cuando quieras.
+  // Contador de inscritos (cacheado y creciente). Parte de una base y sube:
+  // ~WAITLIST_PER_DAY al día (crecimiento orgánico simulado) + inscripciones reales
+  // de este navegador. Se cachea en localStorage de forma monótona (nunca baja).
+  var WAITLIST_BASE = 200;                    // inscritos de partida
+  var WAITLIST_START = Date.UTC(2026, 7, 6);  // fecha base: 6 ago 2026
+  var WAITLIST_PER_DAY = 7;                    // ritmo de crecimiento diario
 
   /* ---------- referidos ---------- */
   // Código de referido propio (estable en este navegador)
@@ -129,7 +134,9 @@
 
   function goThanks(name) {
     try { sessionStorage.setItem('auro_name', name || ''); } catch (e) {}
-    window.location.href = 'gracias.html';
+    // Desde /es/ o /en/ subimos un nivel a la página de gracias de la raíz.
+    var sub = /\/(?:es|en)\//.test(location.pathname);
+    window.location.href = (sub ? '../' : '') + 'gracias.html';
   }
 
   /* ---------- formulario ---------- */
@@ -193,13 +200,25 @@
     });
   })();
 
-  /* ---------- contador de plazas (sube al apuntarse) ---------- */
+  /* ---------- contador de inscritos (cacheado y creciente) ---------- */
+  var CNT_KEY = 'auro_wl_count';
+  function waitlistCount() {
+    var local = 0;
+    try { local = (JSON.parse(localStorage.getItem(LS_KEY) || '[]')).length; } catch (e) {}
+    var days = Math.max(0, (Date.now() - WAITLIST_START) / 86400000);
+    var target = WAITLIST_BASE + Math.floor(days * WAITLIST_PER_DAY) + local;
+    // Cache monótona: el número mostrado nunca disminuye entre visitas.
+    var cached = 0;
+    try { cached = parseInt(localStorage.getItem(CNT_KEY), 10) || 0; } catch (e) {}
+    if (target < cached) target = cached;
+    try { localStorage.setItem(CNT_KEY, String(target)); } catch (e) {}
+    return target;
+  }
+
   (function initCounter() {
     var el = document.getElementById('wlCount');
     if (!el) return;
-    var local = 0;
-    try { local = (JSON.parse(localStorage.getItem(LS_KEY) || '[]')).length; } catch (e) {}
-    var target = WAITLIST_BASE + local;
+    var target = waitlistCount();
     function fmt(n) { return Math.round(n).toLocaleString('es-ES'); }
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = fmt(target); return; }
     var from = Math.max(0, target - 40), t0 = null, dur = 1200;

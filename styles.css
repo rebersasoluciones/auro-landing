@@ -132,15 +132,15 @@ p{ color:var(--negro-oliva); }
 }
 .btn:active{ transform:translateY(1px); }
 
-/* Principal */
-.btn-primary{ background:var(--negro-oliva); color:var(--crema); }
-.btn-primary:hover{ background:var(--verde-oliva); color:var(--blanco-calido); }
+/* Principal — píldora amarilla (dorada). Botones homogéneos en toda la web. */
+.btn-primary{ background:var(--dorado); color:var(--negro-oliva); }
+.btn-primary:hover{ background:color-mix(in srgb, var(--dorado) 82%, var(--negro-oliva)); color:var(--negro-oliva); }
 
-/* Secundario */
-.btn-secondary{ background:transparent; color:var(--negro-oliva); border:1px solid var(--negro-oliva); }
-.btn-secondary:hover{ background:var(--negro-oliva); color:var(--crema); }
+/* Secundario — píldora de contorno dorado, texto dorado */
+.btn-secondary{ background:transparent; color:var(--dorado); border:1.5px solid var(--dorado); }
+.btn-secondary:hover{ background:var(--dorado); color:var(--negro-oliva); }
 
-/* Editorial (sin caja, línea dorada inferior) */
+/* Editorial (mantenido por compatibilidad; ahora también en dorado) */
 .btn-editorial{
   display:inline-block;
   padding:.2em 0;
@@ -149,7 +149,7 @@ p{ color:var(--negro-oliva); }
   font-size:.95rem;
   letter-spacing:.01em;
   text-transform:none;
-  color:var(--negro-oliva);
+  color:var(--dorado);
   border-bottom:1.5px solid var(--dorado);
   transition:color .2s ease, border-color .2s ease;
 }
@@ -187,13 +187,9 @@ p{ color:var(--negro-oliva); }
   color:var(--negro-oliva);
   position:relative;
   padding-block:6px;
+  transition:color .2s ease;
 }
-.nav a::after{
-  content:""; position:absolute; left:0; bottom:0;
-  width:0; height:1.5px; background:var(--dorado);
-  transition:width .25s ease;
-}
-.nav a:hover::after{ width:100%; }
+.nav a:hover{ color:var(--dorado); }
 
 .header-actions{ display:flex; align-items:center; gap:14px; }
 
@@ -1242,5 +1238,74 @@ html.i18n-extra:not([lang="es"]) .legal__note{ display:block; }
   padding:.75em 1.3em; border-radius:var(--radius-pill);
 }
 @media (min-width:920px){ .sticky-cta{ left:auto; right:24px; bottom:24px; min-width:360px; } }
-@media (max-width:540px){ .sticky-cta{ justify-content:center; padding:8px; } .sticky-cta__txt{ display:none; } }
+/* Móvil: mantener el botón completo con el texto de apoyo (como en ordenador),
+   apilado y centrado para que el texto no quede desplazado a la izquierda. */
+@media (max-width:540px){
+  .sticky-cta{ flex-direction:column; align-items:center; text-align:center; gap:8px; padding:12px 14px 14px; }
+  .sticky-cta__txt{ display:block; text-align:center; width:100%; }
+  .sticky-cta__btn{ width:100%; text-align:center; padding:.85em 1.3em; }
+}
 @media (prefers-reduced-motion:reduce){ .sticky-cta{ transition:none; } }
+
+/* ============================================================
+   20. AJUSTES 2026 — origen inspiracional, media de cata,
+   visor 3D de la lata, logo del footer y retoques móviles
+   ============================================================ */
+
+/* --- 20a. Bloque de origen: imagen inspiracional con Ken Burns suave --- */
+.origin-hero{ position:relative; margin:0; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-soft); }
+.origin-hero__img{
+  display:block; width:100%; height:100%; object-fit:cover;
+  aspect-ratio:3/2;
+  transform:scale(1.04);
+  animation:origin-kenburns 22s ease-in-out infinite alternate;
+}
+.origin-hero__cap{
+  position:absolute; left:0; right:0; bottom:0; margin:0;
+  padding:26px 22px 16px; color:var(--blanco-calido); font-size:1.25rem;
+  background:linear-gradient(to top, color-mix(in srgb,var(--negro-oliva) 78%, transparent), transparent);
+}
+@keyframes origin-kenburns{
+  from{ transform:scale(1.04) translate3d(0,0,0); }
+  to{ transform:scale(1.12) translate3d(-1.5%,-1.5%,0); }
+}
+@media (prefers-reduced-motion:reduce){ .origin-hero__img{ animation:none; transform:none; } }
+
+/* --- 20b. Sección Análisis & cata: media de producción + ficha compacta --- */
+.cata__grid--media{ grid-template-columns:1.05fr .95fr; align-items:center; }
+.cata__media{ position:relative; margin:0; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-soft); }
+.cata__media img{ display:block; width:100%; height:100%; object-fit:cover; aspect-ratio:3/2; }
+.cata__media-cap{
+  position:absolute; left:0; right:0; bottom:0; margin:0;
+  padding:22px 18px 14px; color:var(--blanco-calido); font-size:.9rem;
+  background:linear-gradient(to top, color-mix(in srgb,var(--negro-oliva) 74%, transparent), transparent);
+}
+/* Ficha más pequeña en espacio: radar reducido y datos más compactos */
+.cata__ficha{ display:flex; flex-direction:column; gap:18px; }
+.cata__ficha .radar{ max-width:300px; }
+.cata__ficha .cata__radar{ justify-content:flex-start; }
+.cata__ficha .cata__stats{ gap:16px; }
+.cata__ficha .stat__note{ font-size:.8rem; }
+@media (max-width:880px){ .cata__grid--media{ grid-template-columns:1fr; } .cata__ficha .cata__radar{ justify-content:center; } }
+
+/* --- 20c. Visor 3D de la lata (sección "La lata") --- */
+.lata__viewer{
+  width:100%; height:clamp(360px, 52vh, 560px);
+  background:transparent; --poster-color:transparent; --progress-bar-color:var(--dorado);
+  cursor:grab;
+}
+.lata__viewer:active{ cursor:grabbing; }
+
+/* --- 20d. Logo del footer (imagen en lugar de texto) --- */
+.footer-logo{ display:inline-block; line-height:0; }
+.footer-logo img{
+  height:64px; width:auto;
+  /* el logotipo es oscuro; lo aclaramos para el fondo oscuro del footer */
+  filter:brightness(0) invert(1);
+  opacity:.92;
+}
+
+/* --- 20e. Móvil: logotipo del header más a la izquierda --- */
+@media (max-width:680px){
+  .site-header .brand{ margin-left:-10px; }
+}

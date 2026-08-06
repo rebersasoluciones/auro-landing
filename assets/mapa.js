@@ -102,13 +102,34 @@
 
   function autoplay(i) { go(i); if (i < STEPS.length - 1) autoT = setTimeout(() => autoplay(i + 1), 3400); }
 
-  // Arranca el viaje cuando entra en pantalla
+  // El mapa parte SIEMPRE en España (paso 0) y se queda quieto ahí.
+  // La animación del viaje NO arranca hasta que el usuario llega de verdad
+  // a esta sección (el mapa bien centrado en pantalla). Así nadie lo encuentra
+  // ya terminado en Sierra Mágina.
   go(0, false);
   let started = false;
+  function startJourney() {
+    if (started) return;
+    started = true;
+    stopAuto();
+    autoplay(0);
+  }
   if ('IntersectionObserver' in window) {
     new IntersectionObserver((es, ob) => es.forEach((e) => {
-      if (e.isIntersecting && !started) { started = true; stopAuto(); autoplay(0); ob.disconnect(); }
-    }), { threshold: 0.45 }).observe(document.getElementById('mapa'));
+      // intersectionRatio alto + margen inferior negativo => sólo cuando el
+      // mapa está claramente dentro del viewport, no de pasada al hacer scroll.
+      if (e.isIntersecting && e.intersectionRatio >= 0.6 && !started) {
+        startJourney();
+        ob.disconnect();
+      }
+    }), { threshold: [0.6, 0.75], rootMargin: '0px 0px -12% 0px' })
+      .observe(document.getElementById('mapa'));
+  } else {
+    // Sin IntersectionObserver: arranca al primer scroll manual cercano.
+    window.addEventListener('scroll', function once() {
+      var r = document.getElementById('mapa').getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.55 && r.bottom > 0) { startJourney(); window.removeEventListener('scroll', once); }
+    }, { passive: true });
   }
 
   // Altitud real de la finca
